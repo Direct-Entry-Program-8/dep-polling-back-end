@@ -14,8 +14,8 @@ public interface PollService extends SuperService {
 
     PollDTO savePoll(PollDTO dto);
 
-    void updatePoll(PollDTO dto);
+    void updatePoll(PollDTO dto) throws NotFoundException;
 
-    void deletePoll(int id);
+    void deletePoll(int id) throws NotFoundException;
 
 }

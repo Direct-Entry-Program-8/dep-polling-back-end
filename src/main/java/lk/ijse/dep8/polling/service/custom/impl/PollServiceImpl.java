@@ -21,7 +21,7 @@ public class PollServiceImpl implements PollService {
         try {
             return pollDAO.findAll().stream().map(EntityDTOTransformer::getPollDTO)
                     .collect(Collectors.toList());
-        }finally{
+        } finally {
             em.close();
         }
     }
@@ -34,23 +34,65 @@ public class PollServiceImpl implements PollService {
             return pollDAO.findById(id)
                     .map(EntityDTOTransformer::getPollDTO)
                     .orElseThrow(() -> new NotFoundException("Invalid Poll ID"));
-        }finally{
+        } finally {
             em.close();
         }
     }
 
     @Override
     public PollDTO savePoll(PollDTO dto) {
-        return null;
+        EntityManager em = JPAUtil.getEntityManagerFactory().createEntityManager();
+        PollDAO pollDAO = DAOFactory.getInstance().getDAO(em, DAOFactory.DAOType.POLL);
+        try {
+            em.getTransaction().begin();
+            PollDTO pollDTO = EntityDTOTransformer.getPollDTO(pollDAO.save(EntityDTOTransformer.getPoll(dto)));
+            em.getTransaction().commit();
+            return pollDTO;
+        } catch (Throwable t) {
+            if (em != null && em.getTransaction() != null) {
+                em.getTransaction().rollback();
+            }
+            throw new RuntimeException("Failed to save the poll", t);
+        } finally {
+            em.close();
+        }
     }
 
     @Override
-    public void updatePoll(PollDTO dto) {
-
+    public void updatePoll(PollDTO dto) throws NotFoundException {
+        EntityManager em = JPAUtil.getEntityManagerFactory().createEntityManager();
+        PollDAO pollDAO = DAOFactory.getInstance().getDAO(em, DAOFactory.DAOType.POLL);
+        if (!pollDAO.existsById(dto.getId())) throw new NotFoundException("Invalid poll id");
+        try {
+            em.getTransaction().begin();
+            pollDAO.save(EntityDTOTransformer.getPoll(dto));
+            em.getTransaction().commit();
+        }catch (Throwable t){
+            if (em != null && em.getTransaction() != null) {
+                em.getTransaction().rollback();
+            }
+            throw new RuntimeException("Failed to update the poll", t);
+        } finally {
+            em.close();
+        }
     }
 
     @Override
-    public void deletePoll(int id) {
-
+    public void deletePoll(int id) throws NotFoundException {
+        EntityManager em = JPAUtil.getEntityManagerFactory().createEntityManager();
+        PollDAO pollDAO = DAOFactory.getInstance().getDAO(em, DAOFactory.DAOType.POLL);
+        if (!pollDAO.existsById(id)) throw new NotFoundException("Invalid poll id");
+        try {
+            em.getTransaction().begin();
+            pollDAO.deleteById(id);
+            em.getTransaction().commit();
+        }catch (Throwable t){
+            if (em != null && em.getTransaction() != null) {
+                em.getTransaction().rollback();
+            }
+            throw new RuntimeException("Failed to delete the poll", t);
+        } finally {
+            em.close();
+        }
     }
 }

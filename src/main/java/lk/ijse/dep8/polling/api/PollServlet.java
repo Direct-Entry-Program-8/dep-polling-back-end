@@ -120,6 +120,7 @@ public class PollServlet extends HttpServlet2 {
             }
 
             PollService pollService = ServiceFactory.getInstance().getService(ServiceFactory.ServiceType.POLL);
+            pollDTO.setId(pollId);
             pollService.updatePoll(pollDTO);
 
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);

@@ -25,7 +25,7 @@ class EntityDTOTransformerTest {
     @Test
     void getPoll() {
         // given
-        PollDTO pollDTO = new PollDTO(1, "This is a title", "Dulanga", 10, 5);
+        PollDTO pollDTO = new PollDTO(null, "This is a title", "Dulanga", null, null);
         // when
         Poll poll = EntityDTOTransformer.getPoll(pollDTO);
         // then
