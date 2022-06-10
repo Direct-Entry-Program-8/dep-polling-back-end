@@ -18,6 +18,13 @@ import java.util.regex.Pattern;
 @WebServlet(name = "PollServlet", urlPatterns = "/api/v1/polls/*")
 public class PollServlet extends HttpServlet2 {
 
+    private int getPollId(HttpServletRequest req) {
+        if (req.getPathInfo() == null) throw new ResponseStatusException(404, "Invalid end point");
+        Matcher matcher = Pattern.compile("^/(\\d+)/?$").matcher(req.getPathInfo());
+        if (!matcher.find()) throw new ResponseStatusException(404, "Invalid poll id");
+        return Integer.parseInt(matcher.group(1));
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (req.getPathInfo() == null || req.getPathInfo().equals("/")) {
@@ -60,13 +67,6 @@ public class PollServlet extends HttpServlet2 {
         } catch (JsonbException t) {
             throw new ResponseStatusException(400, "Invalid JSON", t);
         }
-    }
-
-    private int getPollId(HttpServletRequest req) {
-        if (req.getPathInfo() == null) throw new ResponseStatusException(404, "Invalid end point");
-        Matcher matcher = Pattern.compile("^/(\\d+)/?$").matcher(req.getPathInfo());
-        if (!matcher.find()) throw new ResponseStatusException(404, "Invalid poll id");
-        return Integer.parseInt(matcher.group(1));
     }
 
     @Override

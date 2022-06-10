@@ -19,8 +19,7 @@ public abstract class CrudDAOImpl<T extends SuperEntity, ID extends Serializable
 
     @Override
     public T save(T entity) {
-        em.persist(entity);
-        return entity;
+        return em.merge(entity);
     }
 
     @Override
