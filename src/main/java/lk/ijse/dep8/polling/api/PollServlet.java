@@ -20,9 +20,9 @@ public class PollServlet extends HttpServlet2 {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        if (req.getPathInfo() == null || req.getPathInfo().equals("/")){
+        if (req.getPathInfo() == null || req.getPathInfo().equals("/")) {
             /* Todo: Request all polls from the service layer */
-        }else{
+        } else {
             int pollId = getPollId(req);
             /* Todo: Request a poll from the service layer by giving the poll id */
         }
@@ -36,32 +36,33 @@ public class PollServlet extends HttpServlet2 {
         }
         /* Validate the content type */
         if (req.getContentType() == null || !req.getContentType().toLowerCase()
-                .startsWith("application/json")){
+                .startsWith("application/json")) {
             throw new ResponseStatusException(415, "Invalid content type");
         }
-        try{
+        try {
             /* Convert json -> PollDTO */
             Jsonb jsonb = JsonbBuilder.create();
             PollDTO pollDTO = jsonb.fromJson(req.getReader(), PollDTO.class);
 
             /* Validate pollDTO */
-            if (pollDTO.getId() != null){
+            if (pollDTO.getId() != null) {
                 throw new ResponseStatusException(400, "Id should be empty");
-            }else if (pollDTO.getCreatedBy() == null || pollDTO.getCreatedBy().trim().isEmpty()){
+            } else if (pollDTO.getCreatedBy() == null || pollDTO.getCreatedBy().trim().isEmpty()) {
                 throw new ResponseStatusException(400, "Invalid user");
-            }else if (pollDTO.getUpVotes() != 0 || pollDTO.getDownVotes() != 0){
+            } else if ((pollDTO.getUpVotes() != null && pollDTO.getUpVotes() != 0) ||
+                    (pollDTO.getDownVotes() != null && pollDTO.getDownVotes() != 0)) {
                 throw new ResponseStatusException(400, "Votes count should be zero");
-            }else if (pollDTO.getTitle() == null || pollDTO.getTitle().trim().isEmpty()){
+            } else if (pollDTO.getTitle() == null || pollDTO.getTitle().trim().isEmpty()) {
                 throw new ResponseStatusException(400, "Invalid title");
             }
 
             /* Todo: Request to save this pollDTO from service layer */
-        }catch (JsonbException t){
+        } catch (JsonbException t) {
             throw new ResponseStatusException(400, "Invalid JSON", t);
         }
     }
 
-    private int getPollId(HttpServletRequest req){
+    private int getPollId(HttpServletRequest req) {
         if (req.getPathInfo() == null) throw new ResponseStatusException(404, "Invalid end point");
         Matcher matcher = Pattern.compile("^/(\\d+)/?$").matcher(req.getPathInfo());
         if (!matcher.find()) throw new ResponseStatusException(404, "Invalid poll id");
@@ -75,33 +76,38 @@ public class PollServlet extends HttpServlet2 {
 
         /* Validate the content type */
         if (req.getContentType() == null || !req.getContentType().toLowerCase()
-                .startsWith("application/json")){
+                .startsWith("application/json")) {
             throw new ResponseStatusException(415, "Invalid content type");
         }
-        try{
+        try {
             /* Convert json -> PollDTO */
             Jsonb jsonb = JsonbBuilder.create();
             PollDTO pollDTO = jsonb.fromJson(req.getReader(), PollDTO.class);
 
             /* Validate pollDTO */
-            if (pollDTO.getId() != null && pollDTO.getId() != pollId){
+            if (pollDTO.getId() != null && pollDTO.getId() != pollId) {
                 throw new ResponseStatusException(400, "Id mismatched error");
-            }else if (pollDTO.getCreatedBy() == null || pollDTO.getCreatedBy().trim().isEmpty()){
+            } else if (pollDTO.getCreatedBy() == null || pollDTO.getCreatedBy().trim().isEmpty()) {
                 throw new ResponseStatusException(400, "Invalid user");
-            }else if (pollDTO.getUpVotes() < 0 || pollDTO.getDownVotes() < 0){
+            } else if (pollDTO.getUpVotes() == null || pollDTO.getDownVotes() == null) {
+                throw new ResponseStatusException(400, "Invalid votes count");
+            } else if (pollDTO.getUpVotes() < 0 || pollDTO.getDownVotes() < 0) {
                 throw new ResponseStatusException(400, "Votes count can't be negative");
-            }else if (pollDTO.getTitle() == null || pollDTO.getTitle().trim().isEmpty()){
+            } else if (pollDTO.getTitle() == null || pollDTO.getTitle().trim().isEmpty()) {
                 throw new ResponseStatusException(400, "Invalid title");
             }
 
             /* Todo: Request to update this pollDTO from service layer */
-        }catch (JsonbException t){
+        } catch (JsonbException t) {
             throw new ResponseStatusException(400, "Invalid JSON", t);
         }
     }
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("Delete");
+        /* Validate URL */
+        int pollId = getPollId(req);
+
+        /* Todo: Request to delete this poll from service layer */
     }
 }
