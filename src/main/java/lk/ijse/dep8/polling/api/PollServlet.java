@@ -126,6 +126,8 @@ public class PollServlet extends HttpServlet2 {
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
         } catch (JsonbException t) {
             throw new ResponseStatusException(400, "Invalid JSON", t);
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(404, "Invalid Poll ID");
         }
     }
 
@@ -135,8 +137,12 @@ public class PollServlet extends HttpServlet2 {
         int pollId = getPollId(req);
 
         PollService pollService = ServiceFactory.getInstance().getService(ServiceFactory.ServiceType.POLL);
-        pollService.deletePoll(pollId);
+        try {
+            pollService.deletePoll(pollId);
+            resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(404, "Invalid Poll ID");
+        }
 
-        resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
 }
