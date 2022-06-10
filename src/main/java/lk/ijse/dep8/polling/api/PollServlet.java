@@ -17,18 +17,27 @@ public class PollServlet extends HttpServlet2 {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (req.getPathInfo() == null || req.getPathInfo().equals("/")){
-            /* Todo: Get all polls from the service layer */
+            /* Todo: Request all polls from the service layer */
         }else{
             Matcher matcher = Pattern.compile("^/(\\d+)/?$").matcher(req.getPathInfo());
             if (!matcher.find()) throw new ResponseStatusException(404, "Invalid poll id");
             int pollId = Integer.parseInt(matcher.group(1));
-            /* Todo: Get a poll from the service layer */
+            /* Todo: Request a poll from the service layer by giving the poll id */
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("Post");
+        /* Validate the URL */
+        if (req.getPathInfo() != null && !req.getPathInfo().equals("/")) {
+            throw new ResponseStatusException(404, "Invalid end point");
+        }
+        /* Validate the content type */
+        if (req.getContentType() == null || !req.getContentType().toLowerCase()
+                .startsWith("application/json")){
+            throw new ResponseStatusException(415, "Invalid content type");
+        }
+
     }
 
     @Override
