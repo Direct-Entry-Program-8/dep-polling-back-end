@@ -6,6 +6,7 @@ import jakarta.json.bind.JsonbException;
 import lk.ijse.dep8.polling.dto.PollDTO;
 import lk.ijse.dep8.polling.service.ServiceFactory;
 import lk.ijse.dep8.polling.service.custom.PollService;
+import lk.ijse.dep8.polling.service.exception.NotFoundException;
 import lk.ijse.dep8.polling.util.HttpServlet2;
 import lk.ijse.dep8.polling.util.ResponseStatusException;
 
@@ -39,9 +40,14 @@ public class PollServlet extends HttpServlet2 {
             jsonb.toJson(pollDTOS, resp.getWriter());
         } else {
             int pollId = getPollId(req);
-            PollDTO pollDTO = pollService.getPoll(pollId);
-            resp.setContentType("application/json");
-            jsonb.toJson(pollDTO, resp.getWriter());
+            PollDTO pollDTO = null;
+            try {
+                pollDTO = pollService.getPoll(pollId);
+                resp.setContentType("application/json");
+                jsonb.toJson(pollDTO, resp.getWriter());
+            } catch (NotFoundException e) {
+                throw new ResponseStatusException(404, "Invalid ID");
+            }
         }
     }
 
