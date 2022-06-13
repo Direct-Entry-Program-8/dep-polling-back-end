@@ -3,6 +3,7 @@ package lk.ijse.dep8.polling.service.custom.impl;
 import lk.ijse.dep8.polling.dao.DAOFactory;
 import lk.ijse.dep8.polling.dao.custom.PollDAO;
 import lk.ijse.dep8.polling.dto.PollDTO;
+import lk.ijse.dep8.polling.dto.VoteDTO;
 import lk.ijse.dep8.polling.service.custom.PollService;
 import lk.ijse.dep8.polling.service.exception.NotFoundException;
 import lk.ijse.dep8.polling.service.util.EntityDTOTransformer;
@@ -95,6 +96,16 @@ public class PollServiceImpl implements PollService {
             }
             throw new RuntimeException("Failed to delete the poll", t);
         } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public VoteDTO getVote(int pollId, String user) throws NotFoundException {
+        EntityManager em = JPAUtil.getEntityManagerFactory().createEntityManager();
+        try{
+            DAOFactory.getInstance().getDAO()
+        }finally{
             em.close();
         }
     }

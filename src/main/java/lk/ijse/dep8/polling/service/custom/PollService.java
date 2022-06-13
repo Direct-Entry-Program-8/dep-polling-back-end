@@ -1,6 +1,7 @@
 package lk.ijse.dep8.polling.service.custom;
 
 import lk.ijse.dep8.polling.dto.PollDTO;
+import lk.ijse.dep8.polling.dto.VoteDTO;
 import lk.ijse.dep8.polling.service.SuperService;
 import lk.ijse.dep8.polling.service.exception.NotFoundException;
 
@@ -17,5 +18,7 @@ public interface PollService extends SuperService {
     void updatePoll(PollDTO dto) throws NotFoundException;
 
     void deletePoll(int id) throws NotFoundException;
+
+    VoteDTO getVote(int pollId, String user) throws NotFoundException;
 
 }

@@ -4,6 +4,7 @@ import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbException;
 import lk.ijse.dep8.polling.dto.PollDTO;
+import lk.ijse.dep8.polling.dto.VoteDTO;
 import lk.ijse.dep8.polling.service.ServiceFactory;
 import lk.ijse.dep8.polling.service.custom.PollService;
 import lk.ijse.dep8.polling.service.exception.NotFoundException;
@@ -24,7 +25,7 @@ public class PollServlet extends HttpServlet2 {
 
     private int getPollId(HttpServletRequest req) {
         if (req.getPathInfo() == null) throw new ResponseStatusException(404, "Invalid end point");
-        Matcher matcher = Pattern.compile("^/(\\d+)/?$").matcher(req.getPathInfo());
+        Matcher matcher = Pattern.compile("^/(\\d+)(/votes)?/?$").matcher(req.getPathInfo());
         if (!matcher.find()) throw new ResponseStatusException(404, "Invalid poll id");
         return Integer.parseInt(matcher.group(1));
     }
@@ -40,13 +41,27 @@ public class PollServlet extends HttpServlet2 {
             jsonb.toJson(pollDTOS, resp.getWriter());
         } else {
             int pollId = getPollId(req);
-            PollDTO pollDTO = null;
-            try {
-                pollDTO = pollService.getPoll(pollId);
-                resp.setContentType("application/json");
-                jsonb.toJson(pollDTO, resp.getWriter());
-            } catch (NotFoundException e) {
-                throw new ResponseStatusException(404, "Invalid ID");
+            if (req.getPathInfo().contains("votes")){
+                String user = req.getParameter("user");
+                if (user == null){
+                    throw new ResponseStatusException(404, "No user found");
+                }else{
+                    try {
+                        VoteDTO vote = pollService.getVote(pollId, user);
+                        jsonb.toJson(vote, resp.getWriter());
+                    } catch (NotFoundException e) {
+                        throw new ResponseStatusException(404, "No vote record found for this user");
+                    }
+                }
+            }else{
+                PollDTO pollDTO = null;
+                try {
+                    pollDTO = pollService.getPoll(pollId);
+                    resp.setContentType("application/json");
+                    jsonb.toJson(pollDTO, resp.getWriter());
+                } catch (NotFoundException e) {
+                    throw new ResponseStatusException(404, "Invalid ID");
+                }
             }
         }
     }
