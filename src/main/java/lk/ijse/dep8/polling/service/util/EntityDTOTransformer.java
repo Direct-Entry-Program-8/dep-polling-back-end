@@ -4,6 +4,8 @@ import lk.ijse.dep8.polling.dto.PollDTO;
 import lk.ijse.dep8.polling.dto.VoteDTO;
 import lk.ijse.dep8.polling.entity.Poll;
 import lk.ijse.dep8.polling.entity.Vote;
+import lk.ijse.dep8.polling.entity.VotePK;
+import lk.ijse.dep8.polling.util.VoteType;
 import net.bytebuddy.matcher.StringMatcher;
 import org.modelmapper.ModelMapper;
 
@@ -20,13 +22,16 @@ public class EntityDTOTransformer {
     }
 
     public static VoteDTO getVoteDTO(Vote voteEntity){
-        ModelMapper mapper = new ModelMapper();
-        return mapper.map(voteEntity, VoteDTO.class);
+        //ModelMapper mapper = new ModelMapper();
+        //return mapper.map(voteEntity, VoteDTO.class);
+        return new VoteDTO(voteEntity.getPk().getPollId(),
+                voteEntity.getPk().getUser(), voteEntity.getVoteType());
     }
 
     public static Vote getVote(VoteDTO voteDTO){
-        ModelMapper mapper = new ModelMapper();
-        return mapper.map(voteDTO, Vote.class);
+        //ModelMapper mapper = new ModelMapper();
+        //mapper.typeMap(VoteDT)
+        return new Vote(voteDTO.getPollId(), voteDTO.getUser(), voteDTO.getVoteType());
     }
 
 }

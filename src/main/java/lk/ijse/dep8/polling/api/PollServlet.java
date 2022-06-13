@@ -186,7 +186,7 @@ public class PollServlet extends HttpServlet2 {
                 throw new ResponseStatusException(400, "Poll id mismatched error");
             } else if (voteDTO.getUser() != null && !voteDTO.getUser().equals(user)) {
                 throw new ResponseStatusException(400, "User mismatched error");
-            } else if (voteDTO.getVoteType() != null) {
+            } else if (voteDTO.getVoteType() == null) {
                 throw new ResponseStatusException(400, "Vote type can't be empty");
             }
 

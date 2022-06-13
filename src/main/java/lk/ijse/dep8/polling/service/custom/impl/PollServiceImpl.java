@@ -122,6 +122,7 @@ public class PollServiceImpl implements PollService {
             VoteDAO voteDAO = DAOFactory.getInstance().getDAO(em, DAOFactory.DAOType.VOTE);
             if (!voteDAO.existsById(new VotePK(dto.getPollId(), dto.getUser()))){
                 voteDAO.save(EntityDTOTransformer.getVote(dto));
+                em.getTransaction().commit();
                return true;
             }
             voteDAO.save(EntityDTOTransformer.getVote(dto));
