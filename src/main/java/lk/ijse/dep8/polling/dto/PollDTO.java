@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PollDTO implements Serializable {
+public class PollDTO implements Serializable, Comparable<PollDTO> {
     private Integer id;
     private String title;
     private String createdBy;
@@ -21,5 +21,12 @@ public class PollDTO implements Serializable {
         this.createdBy = createdBy;
         this.upVotes = upVotes;
         this.downVotes = downVotes;
+    }
+
+    @Override
+    public int compareTo(PollDTO o) {
+        if (o.getId() == this.id) return 0;
+        if (o.getId() > this.id) return o.getId();
+        else return -1 * o.getId();
     }
 }

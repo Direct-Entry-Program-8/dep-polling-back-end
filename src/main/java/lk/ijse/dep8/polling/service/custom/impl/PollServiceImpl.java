@@ -9,6 +9,7 @@ import lk.ijse.dep8.polling.service.util.EntityDTOTransformer;
 import lk.ijse.dep8.polling.service.util.JPAUtil;
 
 import javax.persistence.EntityManager;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,8 +20,10 @@ public class PollServiceImpl implements PollService {
         EntityManager em = JPAUtil.getEntityManagerFactory().createEntityManager();
         PollDAO pollDAO = DAOFactory.getInstance().getDAO(em, DAOFactory.DAOType.POLL);
         try {
-            return pollDAO.findAll().stream().map(EntityDTOTransformer::getPollDTO)
+            List<PollDTO> pollDTOList = pollDAO.findAll().stream().map(EntityDTOTransformer::getPollDTO)
                     .collect(Collectors.toList());
+            Collections.sort(pollDTOList);
+            return pollDTOList;
         } finally {
             em.close();
         }
