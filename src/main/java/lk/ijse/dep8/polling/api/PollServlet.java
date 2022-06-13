@@ -6,6 +6,7 @@ import jakarta.json.bind.JsonbException;
 import lk.ijse.dep8.polling.dto.PollDTO;
 import lk.ijse.dep8.polling.dto.VoteDTO;
 import lk.ijse.dep8.polling.service.ServiceFactory;
+import lk.ijse.dep8.polling.service.SuperService;
 import lk.ijse.dep8.polling.service.custom.PollService;
 import lk.ijse.dep8.polling.service.exception.NotFoundException;
 import lk.ijse.dep8.polling.util.HttpServlet2;
@@ -41,11 +42,11 @@ public class PollServlet extends HttpServlet2 {
             jsonb.toJson(pollDTOS, resp.getWriter());
         } else {
             int pollId = getPollId(req);
-            if (req.getPathInfo().contains("votes")){
+            if (req.getPathInfo().contains("votes")) {
                 String user = req.getParameter("user");
-                if (user == null){
+                if (user == null) {
                     throw new ResponseStatusException(404, "No user found");
-                }else{
+                } else {
                     try {
                         VoteDTO vote = pollService.getVote(pollId, user);
                         jsonb.toJson(vote, resp.getWriter());
@@ -53,7 +54,7 @@ public class PollServlet extends HttpServlet2 {
                         throw new ResponseStatusException(404, "No vote record found for this user");
                     }
                 }
-            }else{
+            } else {
                 PollDTO pollDTO = null;
                 try {
                     pollDTO = pollService.getPoll(pollId);
@@ -159,5 +160,49 @@ public class PollServlet extends HttpServlet2 {
             throw new ResponseStatusException(404, "Invalid Poll ID");
         }
 
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        if (req.getContentType() == null || !req.getContentType().toLowerCase()
+                .startsWith("application/json")) {
+            throw new ResponseStatusException(415, "Invalid content type");
+        }
+
+        int pollId = getPollId(req);
+        if (!req.getPathInfo().contains("votes")) {
+            throw new ResponseStatusException(404, "Invalid end point");
+        }
+        String user = req.getParameter("user");
+        if (user == null) {
+            throw new ResponseStatusException(400, "Unable to save the vote without a user");
+        }
+
+        try {
+            Jsonb jsonb = JsonbBuilder.create();
+            VoteDTO voteDTO = jsonb.fromJson(req.getReader(), VoteDTO.class);
+
+            if (voteDTO.getPollId() != null && voteDTO.getPollId() != pollId) {
+                throw new ResponseStatusException(400, "Poll id mismatched error");
+            } else if (voteDTO.getUser() != null && !voteDTO.getUser().equals(user)) {
+                throw new ResponseStatusException(400, "User mismatched error");
+            } else if (voteDTO.getVoteType() != null) {
+                throw new ResponseStatusException(400, "Vote type can't be empty");
+            }
+
+            if (voteDTO.getPollId() == null) voteDTO.setPollId(pollId);
+            if (voteDTO.getUser() == null) voteDTO.setUser(user);
+
+            PollService pollService = ServiceFactory.getInstance().getService(ServiceFactory.ServiceType.POLL);
+            boolean result = pollService.saveVote(voteDTO);
+
+            if (result){
+                resp.setStatus(HttpServletResponse.SC_CREATED);
+            }else{
+                resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            }
+        } catch (JsonbException e) {
+            throw new ResponseStatusException(400, "Invalid JSON", e);
+        }
     }
 }

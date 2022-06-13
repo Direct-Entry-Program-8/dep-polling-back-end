@@ -21,4 +21,12 @@ public interface PollService extends SuperService {
 
     VoteDTO getVote(int pollId, String user) throws NotFoundException;
 
+    /**
+     * Save or update a vote
+     *
+     * @param dto
+     * @return if false it means the vote has been updated, otherwise it has been created
+     */
+    boolean saveVote(VoteDTO dto);
+
 }

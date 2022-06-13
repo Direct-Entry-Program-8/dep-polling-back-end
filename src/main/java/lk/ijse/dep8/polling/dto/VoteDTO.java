@@ -11,7 +11,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VoteDTO implements Serializable {
-    private int pollId;
+    private Integer pollId;
     private String user;
     private VoteType voteType;
 }
